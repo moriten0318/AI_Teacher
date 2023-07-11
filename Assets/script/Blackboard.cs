@@ -29,8 +29,8 @@ public class Blackboard : MonoBehaviour
         GameObject instantiatedNode_Prefab = Instantiate(_TextNode, _Text_parent.transform);///Prefab生成
 
         Transform parent01Transform = instantiatedNode_Prefab.transform;///生成したPrefabはTextの親要素なので、親のTransformとして取得
-        Transform parent02Transform = parent01Transform.Find("ChatBoard");
-        Transform childTransform = parent02Transform.Find("ChatText");
+        Transform parent02Transform = parent01Transform.Find("Board");
+        Transform childTransform = parent02Transform.Find("Text");
 
         TextMeshProUGUI _blackboard_Node = childTransform.GetComponent<TextMeshProUGUI>();
 
