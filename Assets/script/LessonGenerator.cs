@@ -21,8 +21,36 @@ public class LessonGenerator : MonoBehaviour
     void Start()
     {
         loadText = textAsset.text;////指定したテキストアセットをloadText1に入れる
-        splitText = loadText.Split(char.Parse("。"));///改行で区切って配列型splitText1に入れる
+        splitText = loadText.Split(char.Parse("。"));///改行で区切って配列型splitTextに入れる
 		textNum = 0;
+        CreateVoiceDate();
+
+    }
+
+    public async void CreateVoiceDate()
+    {
+        int num = 0;
+        string text = "ずんだもんなのだ";
+        Voice voice = await voicevox.CreateVoice(speaker, text);
+            do
+            {
+                if (splitText[num] != "")
+                {
+                    _voicelist.Add(await voicevox.CreateVoice(speaker, splitText[num]));
+                    Debug.Log("音声合成完了:" + splitText[num]);
+                    num++;
+                }
+                else
+                {
+                    Debug.Log("エラー文があったため、スキップしました");
+                    num++;
+                }
+            }
+            while (num < splitText.Length);
+        Debug.Log("全文の音声合成完了");
+        await voicevox.Play(_voicelist[0]);
+        await voicevox.Play(_voicelist[6]);///テスト
+
     }
 
 }
