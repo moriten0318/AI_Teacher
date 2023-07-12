@@ -12,31 +12,31 @@ public class Blackboard : MonoBehaviour
     public GameObject _TextNode;/// 生成するtextPrefabのための変数宣言
     public GameObject _Text_parent;///textnodeの親要素用変数
 	public int maxChildCount = 3;
-	private LoadText _LoadText;
+    private LessonGenerator _generator;
 
 
-	void Start()
+    void Start()
     {
         ///LoadTextスクリプトにアクセスする用
-	_LoadText = GameObject.Find("LoadTextScript").GetComponent<LoadText>();
+    _generator = GameObject.Find("LessonGeneratorScript").GetComponent<LessonGenerator>();
     }
 
 	public void Text_Explain()
 	{
 		//　読み込んだテキストファイルの内容を表示
-			if (_LoadText.splitText1[_LoadText.textNum1] != "")
+			if (_generator.splitText[_generator.textNum] != "")
 			{
-				Create_TextNode(_LoadText.splitText1[_LoadText.textNum1]);
-				_LoadText.textNum1++;
-				if (_LoadText.textNum1 >= _LoadText.splitText1.Length)
+				Create_TextNode(_generator.splitText[_generator.textNum]);
+                _generator.textNum++;
+				if (_generator.textNum >= _generator.splitText.Length)
 				{
-					_LoadText.textNum1 = 0;
+                    _generator.textNum = 0;
 				}
 			}
 			else
 			{
-				Create_TextNode("これはエラーテキストです");
-				_LoadText.textNum1++;
+			    Create_TextNode("これはエラーテキストです");
+                _generator.textNum++;
 			}
 	}
 
