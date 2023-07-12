@@ -5,26 +5,16 @@ using TMPro;
 
 public class Blackboard : MonoBehaviour
 {
+    /// <summary>
+    /// 黒板上に表示される要素を管理するクラス
+    /// </summary>
 
     public GameObject _TextNode;/// 生成するtextPrefabのための変数宣言
     public GameObject _Text_parent;///textnodeの親要素用変数
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void Create_TextNode(string text)
     {
         ///テキストを黒板上に表示するためのメソッド
-
 
         GameObject instantiatedNode_Prefab = Instantiate(_TextNode, _Text_parent.transform);///Prefab生成
 
