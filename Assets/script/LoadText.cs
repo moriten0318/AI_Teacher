@@ -6,7 +6,7 @@ using TMPro;
 
 
 public class LoadText : MonoBehaviour
-{
+{///もう使わないスクリプトファイル
 
 	//　読み込んだテキストを出力するUIテキスト
 	///[SerializeField]

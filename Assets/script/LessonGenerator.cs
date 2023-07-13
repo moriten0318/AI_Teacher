@@ -16,7 +16,9 @@ public class LessonGenerator : MonoBehaviour
     int speaker = 20;　//もち子さん
     public List<Voice> _voicelist = new List<Voice>();
 
-    bool waiting_flag = true;///trueだったら進んでよし
+    public bool flag = false;///trueだったら進んでよし
+
+    [SerializeField] GameObject loadpanel;
 
     void Start()
     {
@@ -30,8 +32,6 @@ public class LessonGenerator : MonoBehaviour
     public async void CreateVoiceDate()
     {
         int num = 0;
-        string text = "ずんだもんなのだ";
-        Voice voice = await voicevox.CreateVoice(speaker, text);
             do
             {
                 if (splitText[num] != "")
@@ -39,6 +39,10 @@ public class LessonGenerator : MonoBehaviour
                     _voicelist.Add(await voicevox.CreateVoice(speaker, splitText[num]));
                     Debug.Log("音声合成完了:" + splitText[num]);
                     num++;
+                    if (num == 1)
+                    {///最初の音声合成時にtrueにする
+                        flag = true;
+                    }
                 }
                 else
                 {
@@ -47,10 +51,8 @@ public class LessonGenerator : MonoBehaviour
                 }
             }
             while (num < splitText.Length);
-        Debug.Log("全文の音声合成完了");
-        await voicevox.Play(_voicelist[0]);
-        await voicevox.Play(_voicelist[6]);///テスト
-
+        Debug.Log("全ての音声合成完了");
     }
+
 
 }
