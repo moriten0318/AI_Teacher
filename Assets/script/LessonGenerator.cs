@@ -17,7 +17,7 @@ public class LessonGenerator : MonoBehaviour
     public List<Voice> _voicelist = new List<Voice>();
 
     public bool flag = false;///trueだったら進んでよし
-
+    [SerializeField] GameObject bottun;
     [SerializeField] GameObject loadpanel;
 
     void Start()
@@ -25,6 +25,7 @@ public class LessonGenerator : MonoBehaviour
         loadText = textAsset.text;////指定したテキストアセットをloadText1に入れる
         splitText = loadText.Split(char.Parse("。"));///改行で区切って配列型splitTextに入れる
 		textNum = 0;
+
         CreateVoiceDate();
 
     }
@@ -41,7 +42,7 @@ public class LessonGenerator : MonoBehaviour
                     num++;
                     if (num == 1)
                     {///最初の音声合成時にtrueにする
-                        flag = true;
+                    bottun.SetActive(true);
                     }
                 }
                 else
