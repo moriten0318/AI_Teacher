@@ -17,6 +17,8 @@ public class MotionPlayer : MonoBehaviour
         {
             return;
         }
+
+        Debug.Log("Ä¶OK");
         _motionController.PlayAnimation(animation, isLoop: true);//isloop=true‚È‚çƒ‹[ƒvÄ¶‚ğ—LŒø‚É‚·‚é
     }
 

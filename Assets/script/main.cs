@@ -13,14 +13,14 @@ public class main : MonoBehaviour
     public Blackboard BB;
     public LessonGenerator LG;
     public bool flag;
-    public int num;
+    public int voicenum;
 
     void Start()
     {
         BB = GameObject.Find("BlackBoardScript").GetComponent<Blackboard>();
         LG = GameObject.Find("LessonGeneratorScript").GetComponent<LessonGenerator>();
         flag = LG.flag;
-        num = LG.textNum;
+        voicenum = 0;
     }
 
     public async void play_lesson()
@@ -30,10 +30,12 @@ public class main : MonoBehaviour
         {
             ///flagÇ™trueÇ…Ç»Ç¡ÇΩÇÁèàóùÇ∑ÇÈ
             BB.Text_Explain();
-            await voicevox.Play(LG._voicelist[num]);
-            num++;
 
-            if (LG._voicelist[num] == null) 
+            Debug.Log("voicenum="+voicenum);
+            await voicevox.Play(LG._voicelist[voicenum]);
+            voicenum++;
+
+            if (LG._voicelist[voicenum] == null) 
             {
                 flag = false;
             }

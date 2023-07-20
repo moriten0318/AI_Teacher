@@ -16,14 +16,21 @@ public class Blackboard : MonoBehaviour
     public GameObject _ImageNode;
 	public int maxChildCount = 3;
     private LessonGenerator _generator;
-    public int IMGnum = 1;
+    private int IMGnum = 1;
     public List<Sprite> spriteList = new List<Sprite>();
+
+    AudioSource audioSource;
+    public AudioClip boardsound;
+
 
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+
         ///LoadTextスクリプトにアクセスする用
         _generator = GameObject.Find("LessonGeneratorScript").GetComponent<LessonGenerator>();
+
         ///ImageFileのSpriteをListに入れる
         for (int i = 1; i <= 3; i++)
         {
@@ -57,12 +64,11 @@ public class Blackboard : MonoBehaviour
     {
         ///テキストを黒板上に表示するためのメソッド///
 
-        Transform imageObject = _Text_parent.transform.Find("ImagePrefab");
+        Transform imageObject = _Text_parent.transform.Find("ImagePrefab(Clone)");
         ///黒板上にImageを表示した次は削除する
         if (imageObject != null)
         {
             Destroy_TextNode();
-            Debug.Log("画像があったので消しました");
         }
 
         if (_Text_parent.transform.childCount >= maxChildCount)///黒板上に３つ以上Nodeが溜まったら削除する
@@ -71,12 +77,16 @@ public class Blackboard : MonoBehaviour
         }
 
         string n = IMGnum.ToString();
-        bool containsIMGnum = text.Contains("image"+n);///
+        string checktext = string.Format("image{0}", n);
+        bool containsIMGnum = text.Contains(checktext);
+
+
         if (containsIMGnum)
-        {
+        {///画像表示あり
             Debug.Log("画像表示マーカー確認");
             GameObject instantiatedNode_Prefab = Instantiate(_TextNode, _Text_parent.transform);///Prefab生成
-            string pattern = "image" + n;
+            
+            string pattern = checktext;
             text = Regex.Replace(text, pattern, "");
 
             Transform parent01Transform = instantiatedNode_Prefab.transform;///生成したPrefabはTextの親要素なので、親のTransformとして取得
@@ -94,7 +104,7 @@ public class Blackboard : MonoBehaviour
             Create_Image();
         }
         else
-        {
+        {///画像表示無し
             Debug.Log("画像マーカーなし");
             GameObject instantiatedNode_Prefab = Instantiate(_TextNode, _Text_parent.transform);///Prefab生成
             Transform parent01Transform = instantiatedNode_Prefab.transform;///生成したPrefabはTextの親要素なので、親のTransformとして取得
@@ -105,6 +115,7 @@ public class Blackboard : MonoBehaviour
             _blackboard_Node.text = text;
 
         }
+        BoardSound();
 
     }
 
@@ -112,7 +123,7 @@ public class Blackboard : MonoBehaviour
     {
         GameObject instantiatedImage_Prefab = Instantiate(_ImageNode, _Text_parent.transform);///Prefab生成
         Image _IMGcompornent = instantiatedImage_Prefab.GetComponent<Image>();
-        _IMGcompornent.sprite = spriteList[IMGnum-1];
+        _IMGcompornent.sprite = spriteList[IMGnum];
         IMGnum++;
     }
 
@@ -124,4 +135,11 @@ public class Blackboard : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
+
+    public void BoardSound()
+    {
+        // 音声の再生
+        audioSource.PlayOneShot(boardsound);
+    }
+
 }
