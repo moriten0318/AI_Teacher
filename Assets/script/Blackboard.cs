@@ -123,7 +123,10 @@ public class Blackboard : MonoBehaviour
     {
         GameObject instantiatedImage_Prefab = Instantiate(_ImageNode, _Text_parent.transform);///Prefabê∂ê¨
         Image _IMGcompornent = instantiatedImage_Prefab.GetComponent<Image>();
-        _IMGcompornent.sprite = spriteList[IMGnum];
+        if (spriteList[IMGnum-1] != null)
+        {
+            _IMGcompornent.sprite = spriteList[IMGnum-1];
+        }
         IMGnum++;
     }
 

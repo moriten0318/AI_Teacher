@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 public class main : MonoBehaviour
 {
     [SerializeField] VOICEVOX voicevox;///VOICEVOXスクリプトアタッチしたオブジェクトを入れろ
-    
+
     public Blackboard BB;
     public LessonGenerator LG;
     public bool flag;
@@ -21,11 +21,13 @@ public class main : MonoBehaviour
         LG = GameObject.Find("LessonGeneratorScript").GetComponent<LessonGenerator>();
         flag = LG.flag;
         voicenum = 0;
+
     }
 
     public async void play_lesson()
     {
         await WaitForFlag();
+
         while (flag)
         {
             ///flagがtrueになったら処理する
