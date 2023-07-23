@@ -21,7 +21,7 @@ public class LessonGenerator : MonoBehaviour
 
     public bool flag = false;///true‚¾‚Á‚½‚çi‚ñ‚Å‚æ‚µ
     [SerializeField] GameObject bottun;
-    [SerializeField] GameObject loadpanel;
+    [SerializeField] GameObject _loading;
 
     void Start()
     {
@@ -58,6 +58,7 @@ public class LessonGenerator : MonoBehaviour
                     if (num == 1)
                     {///Å‰‚Ì‰¹º‡¬‚Étrue‚É‚·‚é
                     bottun.SetActive(true);
+                    Destroy(_loading);
                     }
                 }
                 else

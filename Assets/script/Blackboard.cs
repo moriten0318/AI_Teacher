@@ -14,7 +14,8 @@ public class Blackboard : MonoBehaviour
     public GameObject _TextNode;/// 生成するtextPrefabのための変数宣言
     public GameObject _Text_parent;///textnodeの親要素用変数
     public GameObject _ImageNode;
-	public int maxChildCount = 3;
+
+    public int maxChildCount = 3;
     private LessonGenerator _generator;
     private int IMGnum = 1;
     public List<Sprite> spriteList = new List<Sprite>();
@@ -30,6 +31,8 @@ public class Blackboard : MonoBehaviour
 
         ///LoadTextスクリプトにアクセスする用
         _generator = GameObject.Find("LessonGeneratorScript").GetComponent<LessonGenerator>();
+
+
 
         ///ImageFileのSpriteをListに入れる
         for (int i = 1; i <= 3; i++)
