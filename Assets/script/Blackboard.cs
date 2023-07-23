@@ -35,10 +35,14 @@ public class Blackboard : MonoBehaviour
 
 
         ///ImageFile‚ÌSprite‚ðList‚É“ü‚ê‚é
-        for (int i = 1; i <= 3; i++)
+        for (int i = 1; ; i++)
         {
-            string spritePath = "Imagefile1/Image" + i;
+            string spritePath = "Imagefile2/Image" + i;
             Sprite sprite = Resources.Load<Sprite>(spritePath);
+            if (sprite == null)
+            {
+                break;
+            }
             spriteList.Add(sprite);
         }
     }
