@@ -8,7 +8,7 @@ using System.Threading;
 
 public class UDP : MonoBehaviour {
 
-    /// 受信するC＃側のスクリプト
+/// UDP通信回りを管理するスクリプト
  static UdpClient udp;
  IPEndPoint remoteEP = null;
  // Use this for initialization
