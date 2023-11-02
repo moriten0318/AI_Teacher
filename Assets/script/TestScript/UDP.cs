@@ -9,6 +9,7 @@ using System.Threading;
 public class UDP : MonoBehaviour {
 
 /// UDP通信回りを管理するスクリプト
+/// フリーズするから使うな
  static UdpClient udp;
  IPEndPoint remoteEP = null;
  // Use this for initialization

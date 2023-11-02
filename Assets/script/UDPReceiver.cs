@@ -11,6 +11,11 @@ public class UDPReceiver : MonoBehaviour
 
     private static UdpClient udp;
     private IPEndPoint remoteEP;
+    public main main;
+    public List<string> question = new List<string>();
+    public List<string> answer = new List<string>();
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +33,12 @@ public class UDPReceiver : MonoBehaviour
             UdpReceiveResult result = await udp.ReceiveAsync();
             byte[] data = result.Buffer;
             string text = Encoding.UTF8.GetString(data);
-            Debug.Log(text);
+
+            string[] list = text.Split(char.Parse("@"));
+            question.Add(list[0]);
+            answer.Add(list[1]);
+            main.Qflag = true;///UDP通信を受け取ったらtrueにする
+            Debug.Log("フラッグがTrueになったよ");
         }
 
     }

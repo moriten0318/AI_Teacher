@@ -18,15 +18,13 @@ public class LessonGenerator : MonoBehaviour
     [SerializeField] VOICEVOX voicevox;///VOICEVOXスクリプトアタッチしたオブジェクトを入れろ
     int speaker = 20;　//もち子さん
     public List<Voice> _voicelist = new List<Voice>();
-
-    public bool flag = false;///trueだったら進んでよし
     [SerializeField] GameObject bottun;
     [SerializeField] GameObject _loading;
 
     void Start()
     {
-        loadText = textAsset.text;////指定したテキストアセットをloadText1に入れる
-        splitText = loadText.Split(char.Parse("。"));///改行で区切って配列型splitTextに入れる
+        loadText = textAsset.text;////指定したテキストアセットをloadTextに入れる
+        splitText = loadText.Split(char.Parse("。"));///句読点で区切って配列型splitTextに入れる
         textNum = 0;
         imgnum = 1;
 
@@ -53,10 +51,10 @@ public class LessonGenerator : MonoBehaviour
                     }
 
                     _voicelist.Add(await voicevox.CreateVoice(speaker,addtext));
-                    Debug.Log("音声合成完了:" + splitText[num]);
+                    //Debug.Log("音声合成完了:" + splitText[num]);
                     num++;
                     if (num == 1)
-                    {///最初の音声合成時にtrueにする
+                    {///最初の音声合成時にボタンをtrueにする
                     bottun.SetActive(true);
                     Destroy(_loading);
                     }
