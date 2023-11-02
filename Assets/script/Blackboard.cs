@@ -142,6 +142,8 @@ public class Blackboard : MonoBehaviour
 
         TextMeshProUGUI _blackboard_Node = childTransform.GetComponent<TextMeshProUGUI>();
         _blackboard_Node.text = text;
+
+        Invoke("Destroy_QuestionNode", 10.0f);
     }
 
     public void Create_AnswerNode(string text)
@@ -155,7 +157,7 @@ public class Blackboard : MonoBehaviour
         TextMeshProUGUI _blackboard_Node = childTransform.GetComponent<TextMeshProUGUI>();
         _blackboard_Node.text = text;
 
-        Invoke("Destroy_QuestionNode", 10.0f);
+        
 
     }
 

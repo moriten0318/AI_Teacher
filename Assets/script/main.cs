@@ -50,15 +50,27 @@ public class main : MonoBehaviour
             ///質問が来てQflagがtrueになったら処理する
             if (Qflag ==true)
             {
+                Qflag = false;
+                // Answer関数実行中なら待機
+                while (isAnswering)
+                {
+                    await Task.Delay(100);
+                }
+                isAnswering = true;
                 Answer();
+                isAnswering = false;
             }
             else
             {
+                while (isAnswering)
+                {
+                    await Task.Delay(100);
+                }
                 BB.Text_Explain(textnum);
                 await voicevox.Play(LG._voicelist[voicenum]);
                 textnum++;
                 voicenum++;
-                await Task.Delay(2500);///ちょっと待機
+                await Task.Delay(2000);///ちょっと待機
 
                 if (LG._voicelist[voicenum] == null)
                 {
@@ -76,6 +88,9 @@ public class main : MonoBehaviour
         }
     }
 
+    private bool isAnswering = false;
+
+
     public async Task WaitForFlag()
     {
         while (!mainflag)
@@ -86,20 +101,16 @@ public class main : MonoBehaviour
 
     public async void Answer()
     {
-
-        Qflag = false;
         // 受け取った時の音声ファイルをランダム再生
         int randomIndex = Random.Range(0, soundFiles.Length);
         AudioClip randomSound = soundFiles[randomIndex];
         audioSource.clip = randomSound;
         audioSource.Play();
 
-        await Task.Delay(2000);///ちょっと待機
         BB.Create_QuestionNode(UDP.question[questionnum]);
         BB.Create_AnswerNode(UDP.answer[questionnum]);
         await voicevox.PlayOneShot(20,UDP.answer[questionnum]);
         questionnum++;
-
     }
 
 }

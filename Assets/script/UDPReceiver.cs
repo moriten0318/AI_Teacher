@@ -38,7 +38,7 @@ public class UDPReceiver : MonoBehaviour
             question.Add(list[0]);
             answer.Add(list[1]);
             main.Qflag = true;///UDP通信を受け取ったらtrueにする
-            Debug.Log("フラッグがTrueになったよ");
+            Debug.Log("フラッグがTrueに変更");
         }
 
     }
