@@ -31,7 +31,7 @@ public class main : MonoBehaviour
         BB = GameObject.Find("BlackBoardScript").GetComponent<Blackboard>();
         LG = GameObject.Find("LessonGeneratorScript").GetComponent<LessonGenerator>();
         audioSource = GetComponent<AudioSource>();
-        randomcomment = new string[] { "あ、質問が届いていますね", "あ、生徒のかたからメッセージが届いてますね", "メッセージが来てます！お答えします！" };
+        randomcomment = new string[] { "あ、質問が届いていますね", "あ、生徒さんからメッセージが届いてますね", "メッセージが来てます！お答えします！" };
 
         mainflag = true;
         Qflag = false;
@@ -62,20 +62,28 @@ public class main : MonoBehaviour
                 int count = questionnum;
                 while (count < UDPQuestion.Length)
                 {
-                    BB.Create_QuestionNode(UDPQuestion[count]);///生徒からの質問を表示する
-                    
-                    if (UDP.question_voicelist[count]!=null)
+                    BB.Create_QuestionNode(UDPQuestion[count]);///生徒からの質問を表示する                    
+                    if (UDP.question_voicelist.Count> count)
                     {
-
+                        Debug.Log("成功1");
+                        await voicevox.Play(UDP.question_voicelist[count]);
                     }
                     else
                     {
                         await voicevox.PlayOneShot(20, UDPQuestion[count]);///生成が間に合わなければ質問を再生成して読み上げるを流す
                     }
                     
-
                     BB.Create_TextNode(UDP.answer[count]);///解答を黒板に表示する
-                    await voicevox.PlayOneShot(20, UDP.answer[count]);///生成が間に合わなければ解答の音声を流す
+                    Debug.Log("count=" + count);
+                    if (UDP.answer_voicelist.Count> count)
+                    {
+                        Debug.Log("成功2");
+                        await voicevox.Play(UDP.answer_voicelist[count]);
+                    }
+                    else
+                    {
+                        await voicevox.PlayOneShot(20,UDP.answer[count]);///生成が間に合わなければ質問を再生成して読み上げるを流す
+                    }                  
                     count++;
                 }
                 questionnum++;

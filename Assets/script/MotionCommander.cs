@@ -12,14 +12,19 @@ public class MotionCommander : MonoBehaviour
 
     public AnimationClip idle_animation;
 
-    void Start()
+    private void OnValidate()
     {
         _motionplayer = _haru_model.GetComponent<MotionPlayer>();
+        Idle_Motion_Play();
+    }
+
+    void Start()
+    {
+        Invoke("Idle_Motion_Play",1f);
     }
 
     public void Idle_Motion_Play()
     {
-
         _motionplayer.Play_roopMotion(idle_animation);
         Debug.Log("アイドリング中・・・");
     }

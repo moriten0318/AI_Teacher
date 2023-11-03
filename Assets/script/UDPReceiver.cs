@@ -29,6 +29,7 @@ public class UDPReceiver : MonoBehaviour
         udp = new UdpClient(LOCAL_PORT);
         udp.Client.ReceiveTimeout = 100000;
         ListenForUDPMessage();
+
     }
 
     async void ListenForUDPMessage()
