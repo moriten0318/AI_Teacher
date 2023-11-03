@@ -163,7 +163,10 @@ public class Blackboard : MonoBehaviour
 
     private void Destroy_QuestionNode()
     {
-        Destroy(_Question_parent.transform.gameObject);
+        foreach (Transform child in _Question_parent.transform)
+        {
+            Destroy(child.gameObject);
+        }
         Debug.Log("¿–âƒm[ƒhíœ");
     }
 

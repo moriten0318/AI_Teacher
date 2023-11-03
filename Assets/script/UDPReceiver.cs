@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using VoicevoxBridge;
 using System.Threading.Tasks;
 
 public class UDPReceiver : MonoBehaviour
@@ -12,8 +13,12 @@ public class UDPReceiver : MonoBehaviour
     private static UdpClient udp;
     private IPEndPoint remoteEP;
     public main main;
+    [SerializeField] VOICEVOX voicevox;
+
     public List<string> question = new List<string>();
     public List<string> answer = new List<string>();
+    public List<Voice> question_voicelist = new List<Voice>();
+    public List<Voice> answer_voicelist = new List<Voice>();
 
 
 
@@ -37,8 +42,10 @@ public class UDPReceiver : MonoBehaviour
             string[] list = text.Split(char.Parse("@"));
             question.Add(list[0]);
             answer.Add(list[1]);
-            main.Qflag = true;///UDP通信を受け取ったらtrueにする
-            Debug.Log("フラッグがTrueに変更");
+            question_voicelist.Add(await voicevox.CreateVoice(20,list[0]));
+            answer_voicelist.Add(await voicevox.CreateVoice(20, list[1]));
+            Debug.Log("UDP受信アリ");
+
         }
 
     }
