@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 public class LessonGenerator : MonoBehaviour
 {
     [SerializeField] public TextAsset textAsset;    //　読む込むテキストが書き込まれている.txtファイル
+
     public string loadText;    //　テキストファイルから読み込んだデータ
     public string[] splitText;    //　改行で分割して配列に入れる
     public int textNum;    ///　現在表示中テキスト番号(他のScriptでも使うから変にいじらないこと！)
@@ -23,14 +24,22 @@ public class LessonGenerator : MonoBehaviour
 
     void Start()
     {
-        loadText = textAsset.text;////指定したテキストアセットをloadTextに入れる
+
+
+    }
+
+    public void LessonGenerate(TextAsset textfile)
+    {
+        _loading.gameObject.SetActive(true);
+
+        loadText = textfile.text;////指定したテキストアセットをloadTextに入れる
         splitText = loadText.Split(char.Parse("。"));///句読点で区切って配列型splitTextに入れる
         textNum = 0;
         imgnum = 1;
 
         CreateVoiceDate();
-
     }
+
 
     public async void CreateVoiceDate()
     {

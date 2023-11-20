@@ -6,7 +6,7 @@ using TMPro;
 using VoicevoxBridge;
 using System.Threading.Tasks;
 
-public class main : MonoBehaviour
+public class Main : MonoBehaviour
 {
     [SerializeField] VOICEVOX voicevox;///VOICEVOXスクリプトアタッチしたオブジェクトを入れろ
 
@@ -23,8 +23,8 @@ public class main : MonoBehaviour
 
     public string[] UDPQuestion;
 
-    public string[] randomcomment;    
-    public List<Voice>randamvoice = new List<Voice>();
+    public string[] randomcomment;
+    public List<Voice> randamvoice = new List<Voice>();
 
     public string[] unicomment;
     public List<Voice> univoice = new List<Voice>();
@@ -34,7 +34,7 @@ public class main : MonoBehaviour
         BB = GameObject.Find("BlackBoardScript").GetComponent<Blackboard>();
         LG = GameObject.Find("LessonGeneratorScript").GetComponent<LessonGenerator>();
         randomcomment = new string[] { "あ、質問が届いていますね", "あ、生徒さんからメッセージが届いてますね", "メッセージが来てます！お答えします！" };
-        unicomment = new string[] {"質問ありがとうございます。それでは授業を続けます" };
+        unicomment = new string[] { "質問ありがとうございます。それでは授業を続けます" };
 
         mainflag = true;
         Qflag = false;
@@ -60,7 +60,7 @@ public class main : MonoBehaviour
                 UDPQuestion = UDP.question.ToArray();///UDPQuestionを更新
 
                 int ranint = Random.Range(0, randomcomment.Length);
-                await voicevox.Play(randamvoice[ranint],autoReleaseVoice: false);
+                await voicevox.Play(randamvoice[ranint], autoReleaseVoice: false);
                 randamvoice[ranint] = await voicevox.CreateVoice(20, randomcomment[ranint]);
                 BB.Create_TextNode(randomcomment[ranint]);
 
@@ -68,28 +68,28 @@ public class main : MonoBehaviour
                 while (count < UDPQuestion.Length)
                 {
                     BB.Create_QuestionNode(UDPQuestion[count]);///生徒からの質問を表示する                    
-                    if (UDP.question_voicelist.Count> count)
+                    if (UDP.question_voicelist.Count > count)
                     {
-                        await voicevox.Play(UDP.question_voicelist[count],autoReleaseVoice: false);
+                        await voicevox.Play(UDP.question_voicelist[count], autoReleaseVoice: false);
                     }
                     else
                     {
                         await voicevox.PlayOneShot(20, UDPQuestion[count]);///生成が間に合わなければ質問を再生成して読み上げるを流す
                     }
-                    
+
                     BB.Create_TextNode(UDP.answer[count]);///解答を黒板に表示する
                     Debug.Log("count=" + count);
-                    if (UDP.answer_voicelist.Count> count)
+                    if (UDP.answer_voicelist.Count > count)
                     {
-                        await voicevox.Play(UDP.answer_voicelist[count],autoReleaseVoice: false);
+                        await voicevox.Play(UDP.answer_voicelist[count], autoReleaseVoice: false);
                     }
                     else
                     {
-                        await voicevox.PlayOneShot(20,UDP.answer[count]);///生成が間に合わなければ質問を再生成して読み上げるを流す
+                        await voicevox.PlayOneShot(20, UDP.answer[count]);///生成が間に合わなければ質問を再生成して読み上げるを流す
                     }
 
                     BB.Create_TextNode(unicomment[0]);
-                    await voicevox.Play(univoice[uninum],autoReleaseVoice: false);
+                    await voicevox.Play(univoice[uninum], autoReleaseVoice: false);
                     univoice[uninum] = await voicevox.CreateVoice(20, unicomment[uninum]);
                     CreateUniVoice();
 
@@ -116,20 +116,7 @@ public class main : MonoBehaviour
                 Debug.Log("音声再生は終了しました");
                 await Task.Delay(1000);
             }
-
-/*            if (LG._voicelist[voicenum] == null)
-            {
-                mainflag = false;
-            }
-            if (textnum >= LG.splitText.Length)
-            {
-                mainflag = false;
-            }*/
         }
-
-
-            
-
     }
 
     private async void CreateRandamVoice()
@@ -171,22 +158,4 @@ public class main : MonoBehaviour
         }
         while (num < unicomment.Length);
     }
-
-
-
-
-    /*    public async void Answer()
-        {
-            // 受け取った時の音声ファイルをランダム再生
-            int randomIndex = Random.Range(0, soundFiles.Length);
-            AudioClip randomSound = soundFiles[randomIndex];
-            audioSource.clip = randomSound;
-            audioSource.Play();
-
-            BB.Create_QuestionNode(UDP.question[questionnum]);
-            BB.Create_AnswerNode(UDP.answer[questionnum]);
-            await voicevox.PlayOneShot(20,UDP.answer[questionnum]);
-            questionnum++;
-        }*/
-
 }
