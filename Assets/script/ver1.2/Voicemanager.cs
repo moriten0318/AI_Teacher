@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 public class Voicemanager : MonoBehaviour
 {
-
+    [SerializeField] GameObject bottun;
 
     [SerializeField] VOICEVOX voicevox;///VOICEVOXスクリプトアタッチしたオブジェクトを入れろ
     int speaker = 20;　//もち子さん
@@ -22,7 +22,7 @@ public class Voicemanager : MonoBehaviour
     public async Task<List<Voice>> CreateVoiceDate(int num)
     {///voicevoxで音声合成をする(リストを返す)
 
-        Debug.Log("音声合成開始");
+/*        Debug.Log("音声合成開始");*/
         List<Voice> voicelist = new List<Voice>();
 
         JSONmanager _jsonManager = GameObject.FindObjectOfType<JSONmanager>();
@@ -33,7 +33,7 @@ public class Voicemanager : MonoBehaviour
         while (_jsonManager.lessons == null)
         {
             await Task.Delay(100); // 100ミリ秒待機して再度チェック
-            Debug.Log("音声合成待機中");
+/*            Debug.Log("音声合成待機中");*/
         }
 
         // 他のスクリプトから JSONmanager インスタンスの Lessons プロパティにアクセス
@@ -54,7 +54,7 @@ public class Voicemanager : MonoBehaviour
                 if (!string.IsNullOrEmpty(addtext))
                 {
                     voicelist.Add(await voicevox.CreateVoice(speaker, addtext));
-                    Debug.Log(addtext);
+/*                    Debug.Log(addtext);*/
                 }
                 i++;
             }
@@ -65,7 +65,13 @@ public class Voicemanager : MonoBehaviour
             Debug.Log("エラー文があったため、スキップしました");
             num++;
         }
-        Debug.Log("セクションの音声合成完了");
+        /*        Debug.Log("セクションの音声合成完了");*/
+
+        if (num == 0)
+        {///最初の音声合成時にボタンをtrueにする
+            bottun.SetActive(true);
+        }
+
         return voicelist;
     }
 }

@@ -16,12 +16,9 @@ using System.Linq;
 [System.Serializable]
 public class LessonSection
 {
-    public string 時間;
-    public string 学習活動;
-    public string 指導上の留意点;
-    public string 評価の観点;
+    public string 内容の説明;
+    public string キーワード;
     public string 板書;
-    public string 画像;
     public string 教師の発話;
 }
 
@@ -31,7 +28,7 @@ public class JSONmanager : MonoBehaviour
     public MainManager _Main;
 
     string LESSONDATA_PATH = "C://Users//moris//Desktop//Mypython//AITeacher_python//lessondata";
-    string JSON_PATH = "//updated_honji_tenkai_1121.json";
+    string JSON_PATH = "//honji_tenkai_1202.json";
 
     public Lesson[] jsondata { get; private set; }    /// 読み取り専用の配列としてlessonsを定義
     public string[] lessons { get; private set; }    /// 読み取り専用の配列としてlessonsを定義

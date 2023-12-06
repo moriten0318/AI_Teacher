@@ -11,6 +11,7 @@ public class BlackBoardManager : MonoBehaviour
     public MainManager _Main;
 
     public RawImage BlackBoard;
+    public Texture2D slide0;
     private Texture2D[] textureArray;
     string LESSONDATA_PATH = "C://Users//moris//Desktop//Mypython//AITeacher_python//lessondata";
 
@@ -18,17 +19,12 @@ public class BlackBoardManager : MonoBehaviour
     List<Texture2D> textureList = new List<Texture2D>();
 
 
-    // Start is called before the first frame update
-    void Awake()
-    {
-        Texture2D[] textureArray; //配列を作成
-    }
 
     void Start()
     {
-
+        textureList.Add(slide0);
         // フォルダ内のPNGファイルを読み込んでリストに入れる
-        int i = 0;
+        int i = 1;
         while (true)
         {
             string fileName = "slide" + i + ".png"; // ファイル名を生成
