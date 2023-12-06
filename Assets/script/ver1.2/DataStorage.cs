@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+using VoicevoxBridge;
+
 public class MessageStorage : MonoBehaviour
 {
     // IDをキーとして、メッセージのリストを保存
@@ -25,5 +28,24 @@ public class MessageStorage : MonoBehaviour
             return messagesById[id];
         }
         return new List<MessageData>();
+    }
+}
+
+public class VoiceStorage : MonoBehaviour
+{
+    private Dictionary<int, Voice> voiceById = new Dictionary<int, Voice>();
+
+    public void StoreVoice(int id, Voice voice)
+    {
+        voiceById[id] = voice;
+    }
+
+    public Voice GetVoice(int id)
+    {
+        if (voiceById.TryGetValue(id, out Voice voice))
+        {
+            return voice;
+        }
+        return null;
     }
 }

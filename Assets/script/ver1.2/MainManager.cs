@@ -32,8 +32,6 @@ public class MainManager : MonoBehaviour
 
     public Scrollbar _ScrollBar;
 
-    private MessageStorage messageStorage = new MessageStorage();
-
 
 
 
