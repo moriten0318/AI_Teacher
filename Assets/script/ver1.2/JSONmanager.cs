@@ -25,7 +25,7 @@ public class LessonSection
 public class JSONmanager : MonoBehaviour
 {
 
-    public MainManager _Main;
+    private LessonDataStorage _storage = new LessonDataStorage();
 
     string LESSONDATA_PATH = "C://Users//moris//Desktop//Mypython//AITeacher_python//lessondata";
     string JSON_PATH = "//honji_tenkai_1202.json";
@@ -34,26 +34,36 @@ public class JSONmanager : MonoBehaviour
     public string[] lessons { get; private set; }    /// 読み取り専用の配列としてlessonsを定義
 
 
-    private void LoadSpeech()
+    public Dictionary<int, List<string>> LoadSpeech()
     {
         string json = File.ReadAllText(LESSONDATA_PATH+JSON_PATH);
         jsondata = JsonHelper.FromJson<Lesson>(json);
 
-        lessons = jsondata.Select(data => data.教師の発話).ToArray();
+        lessons = jsondata.Select(data => data.教師の発話).ToArray();///1要素に1セクションがある配列
+        Dictionary<int, List<string>> returndic = new Dictionary<int, List<string>>();
 
-        /*        foreach (string lesson in lessons)
-                {
-                    Debug.Log(lesson);
-                }*/
+        int i = 0;
+        foreach (string lesson in lessons)
+        {
+            string[] splittext=lessons[i].Split(char.Parse("。"));
+            List<string> splitList = splittext.ToList();
+            
+            returndic[i] = splitList;
 
-        _Main.lessons = lessons;
+/*            foreach (string text in _storage.GetLessonData(i))
+            {
+                Debug.Log(text);
+                Debug.Log(i);
+            }*/
 
+            i++;
+        }
         Debug.Log("JSONのロード完了");
+        return returndic;
     }
 
-
     private void Start()
-    {
-        LoadSpeech();
+    {        
+
     }
 }

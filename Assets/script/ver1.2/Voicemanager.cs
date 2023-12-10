@@ -9,69 +9,63 @@ using System.Threading.Tasks;
 
 public class Voicemanager : MonoBehaviour
 {
+    private List<string> SplitText;
     [SerializeField] GameObject bottun;
-
     [SerializeField] VOICEVOX voicevox;///VOICEVOXスクリプトアタッチしたオブジェクトを入れろ
-    int speaker = 20;　//もち子さん
+    public int speaker = 20;　//もち子さん
+
+
     
     void Start()
     {
 
     }
 
-    public async Task<List<Voice>> CreateVoiceDate(int num)
+    public async Task<List<Voice>> CreateVoiceDate(int index,List<string> SplitText)
     {///voicevoxで音声合成をする(リストを返す)
 
-/*        Debug.Log("音声合成開始");*/
         List<Voice> voicelist = new List<Voice>();
-
-        JSONmanager _jsonManager = GameObject.FindObjectOfType<JSONmanager>();
-
-
-
-        // _jsonManager.lessons が null でなくなるまで待機
-        while (_jsonManager.lessons == null)
+        int i = 0;
+        do
         {
-            await Task.Delay(100); // 100ミリ秒待機して再度チェック
-/*            Debug.Log("音声合成待機中");*/
-        }
+            string addtext = SplitText[i].Replace("「", "").Replace("」", "").Replace("\\n", "");
 
-        // 他のスクリプトから JSONmanager インスタンスの Lessons プロパティにアクセス
-        string[] lessons = _jsonManager.lessons;
-
-
-        string lessonText = lessons[num]; // 代入する対象の文字列
-     
-        if (lessonText != "")
-        {
-            int i = 0;
-            string[] splitText = lessonText.Split(char.Parse("。"));///句読点で句切ってsplitTextに入れる
-            do
-            {                
-                string addtext= splitText[i].Replace("「", "").Replace("」", "").Replace("\\n", "");
-
-                // addtextが空でないかチェックしてから追加
-                if (!string.IsNullOrEmpty(addtext))
-                {
-                    voicelist.Add(await voicevox.CreateVoice(speaker, addtext));
-/*                    Debug.Log(addtext);*/
-                }
-                i++;
+            // addtextが空でないかチェックしてから追加
+            if (!string.IsNullOrEmpty(addtext))
+            {
+                voicelist.Add(await voicevox.CreateVoice(speaker, addtext));
+                //Debug.Log(addtext);
             }
-            while (i < splitText.Length);
+            i++;
         }
-        else
-        {
-            Debug.Log("エラー文があったため、スキップしました");
-            num++;
-        }
-        /*        Debug.Log("セクションの音声合成完了");*/
+        while (i < SplitText.Count);
 
-        if (num == 0)
+        if (index == 0)
         {///最初の音声合成時にボタンをtrueにする
             bottun.SetActive(true);
         }
 
         return voicelist;
+    }
+
+    public async Task<Voice> CreateOneVoice(string Text)
+    {///voicevoxで音声合成をする(リストを返す)
+
+        Voice voice = null; ;
+        string addtext = Text.Replace("「", "").Replace("」", "").Replace("\\n", "");
+
+        // addtextが空でないかチェックしてから追加
+        if (!string.IsNullOrEmpty(addtext))
+        {
+            voice = await voicevox.CreateVoice(speaker, addtext);
+            Debug.Log($"音声合成結果: {voice != null}");
+        }
+
+        else
+        {
+            Debug.Log("addtextが空");
+        }
+
+        return voice;
     }
 }

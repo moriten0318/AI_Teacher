@@ -15,13 +15,14 @@ public class BlackBoardManager : MonoBehaviour
     private Texture2D[] textureArray;
     string LESSONDATA_PATH = "C://Users//moris//Desktop//Mypython//AITeacher_python//lessondata";
 
-    // テクスチャを配列に追加するためのリストを作成
-    List<Texture2D> textureList = new List<Texture2D>();
 
 
 
-    void Start()
+
+    public List<Texture2D> GetTextureList()
     {
+        // テクスチャを配列に追加するためのリストを作成
+        List<Texture2D> textureList = new List<Texture2D>();
         textureList.Add(slide0);
         // フォルダ内のPNGファイルを読み込んでリストに入れる
         int i = 1;
@@ -51,13 +52,13 @@ public class BlackBoardManager : MonoBehaviour
                 Debug.Log("スライド画像保存完了");
                 break;
             }
+            
         }
-
-        _Main.textureList = textureList;
+        return textureList;
     }
 
 
-    public void UpdateBlackBoard(int boardindex)
+    public void UpdateBlackBoard(int boardindex, List<Texture2D> textureList)
     {
         // インデックスが有効で、テクスチャの数以下の場合にのみ処理を実行
         if (boardindex >= 0 && boardindex < textureList.Count)
