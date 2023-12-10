@@ -81,16 +81,17 @@ public class ResponceMessageStorage
 
 public class QuestionSceneVoiceStorage
 {///質問コーナーで使うボイス管理クラス
-    public string[] IntroText = 
+    private List<string> IntroTextList = new List<string>
         {
-        "それでは、ここまでの内容で質問のある人はいますか？",
-        "分からないことがあればラインにメッセージを送信してくださいね。",
-        "それでは、いくつか質問に答えていきますね。"
+            "それでは、ここまでの内容で質問のある人はいますか？",
+            "分からないことがあればラインにメッセージを送信してくださいね。",
+            "それでは、いくつか質問に答えていきますね。"
         };
-    private List<Voice> IntroVoice=new List<Voice>();
-    public void StoreIntroVoice(Voice voice)
+    private Dictionary<int, Voice> IntroVoice = new Dictionary<int, Voice>();
+
+    public void StoreIntroVoice(int id, Voice voice)
     {
-        IntroVoice.Add(voice);
+        IntroVoice[id] = voice;
     }
 
 

@@ -49,7 +49,7 @@ public class Voicemanager : MonoBehaviour
     }
 
     public async Task<Voice> CreateOneVoice(string Text)
-    {///voicevoxで音声合成をする(リストを返す)
+    {///voicevoxで音声合成をする
 
         Voice voice = null; ;
         string addtext = Text.Replace("「", "").Replace("」", "").Replace("\\n", "");

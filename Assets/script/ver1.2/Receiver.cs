@@ -127,12 +127,17 @@ public class Receiver : MonoBehaviour
     private async void OnMessageAdded(MessageData message)
     {
         // メッセージが追加されたときに呼ばれる関数
-        // 例: Debug.Log("新しいメッセージが追加されました: " + message.content);
         Debug.Log("メッセージイベント発生！！！！！！！！！");
-        Voice voice = await _Voice.CreateOneVoice(message.content);
-        _QVstorage.StoreResponceVoice(message.id, voice);
-        Debug.Log("メッセージイベントから保存完了！！！！！！！！！");
-
+        try
+        {
+            Voice voice = await _Voice.CreateOneVoice(message.content);
+            _QVstorage.StoreResponceVoice(message.id, voice);
+            Debug.Log("メッセージイベントから保存完了！！！！！！！！！");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("音声生成中にエラーが発生しました: " + ex.Message);
+        }
     }
 
     public void StartTrackingSection()

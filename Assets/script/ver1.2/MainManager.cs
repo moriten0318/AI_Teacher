@@ -50,7 +50,7 @@ public class MainManager : MonoBehaviour
 
     async Task Generate_AllSpeechVoice()
     {
-        // fQuestionIntrotext のすべての要素に対して処理を行う
+        // QuestionIntrotext のすべての要素に対して処理を行う
         for (int i = 0; i < _QVstorage.IntroText.Length; i++)
         {
             string txt = _QVstorage.IntroText[i];
