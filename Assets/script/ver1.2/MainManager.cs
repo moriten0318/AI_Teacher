@@ -105,7 +105,7 @@ public class MainManager : MonoBehaviour
         int num = 0;
         while (num < CurrentVoices.Count)
         {
-            _BB.UpdateBlackBoard(index+1, textureList);///スライドの更新(スライドは１枚分数がずれてるので注意!)
+            _BB.UpdateBlackBoard(index+2, textureList);///スライドの更新(スライドは１枚分数がずれてるので注意!)
             Create_captions(SplitText[num]);///字幕生成
             await voicevox.Play(CurrentVoices[num]);///音声再生
             await Task.Delay(500);
@@ -126,7 +126,7 @@ public class MainManager : MonoBehaviour
 
     private async Task QuestionScene()
     {
-        _BB.UpdateBlackBoard(0, textureList);
+        _BB.UpdateBlackBoard(1, textureList);
 
         for (int i = 0; i < _RVStorage.IntroText.Count; i++)
         {
