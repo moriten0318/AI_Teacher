@@ -17,7 +17,7 @@ public class Blackboard : MonoBehaviour
     public GameObject _Question_parent;///questiontnodeの親要素用変数
     public GameObject _ImageNode;
 
-    public int maxChildCount = 3;
+    public int maxChildCount;
     private LessonGenerator _generator;
     private int IMGnum = 1;
     public List<Sprite> spriteList = new List<Sprite>();
@@ -29,15 +29,15 @@ public class Blackboard : MonoBehaviour
 
     void Start()
     {
-        audioSource = GetComponent<AudioSource>();
+        //audioSource = GetComponent<AudioSource>();
 
         ///LoadTextスクリプトにアクセスする用
-        _generator = GameObject.Find("LessonGeneratorScript").GetComponent<LessonGenerator>();
+        //_generator = GameObject.Find("LessonGeneratorScript").GetComponent<LessonGenerator>();
 
 
 
         ///ImageFileのSpriteをListに入れる
-        for (int i = 1; ; i++)
+/*        for (int i = 1; ; i++)
         {
             string spritePath = "Imagefile2/Image" + i;
             Sprite sprite = Resources.Load<Sprite>(spritePath);
@@ -46,23 +46,23 @@ public class Blackboard : MonoBehaviour
                 break;
             }
             spriteList.Add(sprite);
-        }
+        }*/
     }
 
-	public void Text_Explain(int num)
-	{
-		///numのテキストを黒板上にノードとして表示する
-			if (_generator.splitText[num] != "")
-			{
-				Create_TextNode(_generator.splitText[num]);
+    public void Text_Explain(int num)
+    {
+        ///numのテキストを黒板上にノードとして表示する
+        if (_generator.splitText[num] != "")
+        {
+            Create_TextNode(_generator.splitText[num]);
 
-			}
-			else
-			{
-			    Create_TextNode("これはエラーテキストです");
-                _generator.textNum++;
-			}
-	}
+        }
+        else
+        {
+            Create_TextNode("これはエラーテキストです");
+            _generator.textNum++;
+        }
+    }
 
 
     public void Create_TextNode(string text)
@@ -171,7 +171,7 @@ public class Blackboard : MonoBehaviour
     }
 
 
-    private void Destroy_TextNode()
+    public void Destroy_TextNode()
     {
         foreach (Transform child in _Text_parent.transform)
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using VoicevoxBridge;
 using System.Threading.Tasks;
+using System.Linq;
 
 public class MainManager : MonoBehaviour
 {
@@ -13,10 +15,13 @@ public class MainManager : MonoBehaviour
     public Voicemanager _Voice;
     public BlackBoardManager _BB;
     public Receiver _receiver;
+    [SerializeField] private ButtonClick bottun;
+    [SerializeField] private Blackboard _header;
 
     private LessonDataStorage _storage = new LessonDataStorage();
     private VoiceDataStorage _Vstorage = new VoiceDataStorage();
-    private QuestionSceneVoiceStorage _QVstorage = new QuestionSceneVoiceStorage();
+    public ResponceMessageStorage _RMStorage = new ResponceMessageStorage();
+    public ResponceVoiceStorage _RVStorage = new ResponceVoiceStorage();
 
     [SerializeField] VOICEVOX voicevox;///VOICEVOXスクリプトアタッチしたオブジェクトを入れろ
 
@@ -29,9 +34,7 @@ public class MainManager : MonoBehaviour
     private int CurrentSectionIndex=0;///mainループを規定するインデックス
     //bool isPlayingSection = false;
 
-    
-
-
+   
 
     void Start()
     {
@@ -51,12 +54,12 @@ public class MainManager : MonoBehaviour
     async Task Generate_AllSpeechVoice()
     {
         // QuestionIntrotext のすべての要素に対して処理を行う
-        for (int i = 0; i < _QVstorage.IntroText.Length; i++)
+        for (int i = 0; i < _RVStorage.IntroText.Count; i++)
         {
-            string txt = _QVstorage.IntroText[i];
+            string txt = _RVStorage.IntroText[i];
             // 音声を生成し、保存
             Voice voice = await _Voice.CreateOneVoice(txt);
-            _QVstorage.StoreIntroVoice(voice);
+            _RVStorage.StoreIntroVoice(i,voice);
         }
         Debug.Log("質問コーナー導入音声合成完了");
 
@@ -74,6 +77,12 @@ public class MainManager : MonoBehaviour
             List<Voice> voices = await _Voice.CreateVoiceDate(index, lessonData);
             _Vstorage.StoreVoicelist(index, voices);
             // インデックスを増やす
+
+            if (index == 0)
+            {///最初の音声合成時にボタンをtrueにする
+                bottun.BottunToActive();
+            }
+
             index++;
         }
 
@@ -86,7 +95,7 @@ public class MainManager : MonoBehaviour
     public async Task play_section(int index)
     {///１セクションを再生するループ
 
-       
+        _header.Destroy_TextNode();
         List<string> SplitText = _storage.GetLessonData(index);
         List<Voice> CurrentVoices = _Vstorage.GetSectionVoiceList(index);
 
@@ -113,27 +122,60 @@ public class MainManager : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// 回答文をSplitする　序文を再生する
-    /// </summary>
-    /// <returns></returns>
     private async Task QuestionScene()
     {
+        _BB.UpdateBlackBoard(0, textureList);
+        for (int i = 0; i < _RVStorage.IntroText.Count; i++)
+        {
+            Create_captions(_RVStorage.IntroText[i]);
+            Voice v = _RVStorage.GetIntroVoice(i);
+            await voicevox.Play(v, autoReleaseVoice: false); // 音声再生
+        }
 
         for (int i = 0; i < 3; i++)
         {
-            int n = _receiver.RandomID_ThisSection();
-            string responstxt = _receiver.GetMessage(n, true);
-            Debug.Log(responstxt);
+            try
+            {
+                Debug.Log($"i={i}のレスポンスを返します");
+                int n = _receiver.RandomID_ThisSection();
+                Debug.Log($"RandomID_ThisSectionから返されたID: {n}");
+                MessageData responceMessagedata = _RMStorage.GetMessageData(n, true);
+                if (responceMessagedata == null)
+                {
+                    Debug.Log($"ID {n} のMessageDataが見つかりませんでした。");
+                    continue;
+                }
 
-            if (!string.IsNullOrEmpty(responstxt))
-            {
-                Create_captions(responstxt);
-                await voicevox.PlayOneShot(_Voice.speaker, responstxt);
+                string[] splittext = responceMessagedata.content.Split(char.Parse("。"));
+                List<string> txtlist = splittext.ToList();
+                Debug.Log($"分割されたテキストリストのサイズ: {txtlist.Count}");
+
+                List<Voice> voicelist = _RVStorage.GetResponceVoice(n);
+                if (voicelist == null || voicelist.Count == 0)
+                {
+                    Debug.Log($"ID {n} のVoiceリストが不完全、または見つかりませんでした。");
+                    continue;
+                }
+                Debug.Log($"取得されたVoiceリストのサイズ: {voicelist.Count}");
+                // テキストリストと音声リストの要素数が異なる場合は調整する
+                int minCount = Math.Min(txtlist.Count, voicelist.Count);
+
+                ///質問文を表示する
+                MessageData Question = _RMStorage.GetMessageData(n, false);
+                _header.Create_TextNode(Question.content);
+                ///質問への解答を表示、再生する
+                for (int j = 0; j < minCount; j++)
+                {
+                    Debug.Log($"テキスト: {txtlist[j]}, Voiceインデックス: {j}");
+                    Create_captions(txtlist[j]); // 字幕生成
+                    await voicevox.Play(voicelist[j], autoReleaseVoice: false); // 音声再生
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Debug.LogError("Voice is null for ID: " + n);
+                Debug.LogError($"QuestionSceneでエラーが発生したため強制移行します: {ex.Message}");
+                // ここで例外が発生した場合、ループを終了して次のセクションに移行
+                return;
             }
         }
     }

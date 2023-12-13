@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -68,63 +69,94 @@ public class ResponceMessageStorage
         MessageAdded?.Invoke(message);
     }
 
-    // 特定のIDのメッセージを取得
-    public List<MessageData> GetMessagesById(int id)
+    // 特定のIDかつ特定のisResponseを持つMassageDataを取得
+    public MessageData GetMessageData(int id, bool isResponse)
     {
+        /*   旧コード【念のため★】
         if (ResponseMessages.ContainsKey(id))
+                {
+                    return ResponseMessages[id];
+                }
+                return new List<MessageData>();*/
+
+        try
         {
-            return ResponseMessages[id];
+            if (ResponseMessages.TryGetValue(id, out List<MessageData> messages))
+            {
+                foreach (var message in messages)
+                {
+                    if (message.isResponse == isResponse)
+                    {
+                        return message; // 一致するMessageDataを見つけた場合、それを返す
+                    }
+                }
+            }
+            // 条件に一致するメッセージがない場合
+            Debug.LogError($"指定IDのテキストデータが無いよ～(´;ω;｀)ID：: {id} isResponse: {isResponse}");
+            return null;
         }
-        return new List<MessageData>();
+        catch (Exception ex)
+        {
+            // 何らかのエラーが発生した場合、そのエラーをログに出力
+            Debug.LogError("Error in GetMessagesData: " + ex.Message);
+            return null;
+        }
     }
 }
 
-public class QuestionSceneVoiceStorage
+public class ResponceVoiceStorage
 {///質問コーナーで使うボイス管理クラス
-    private List<string> IntroTextList = new List<string>
+    public List<string> IntroText = new List<string>
         {
             "それでは、ここまでの内容で質問のある人はいますか？",
             "分からないことがあればラインにメッセージを送信してくださいね。",
-            "それでは、いくつか質問に答えていきますね。"
+            "メッセージを待つ時間を取りますから、ゆっくり考えて大丈夫ですよ。",
+            "それでは、いくつかの質問に答えていきますね。"
         };
+    ///↑のボイスが入ったリスト
     private Dictionary<int, Voice> IntroVoice = new Dictionary<int, Voice>();
 
     public void StoreIntroVoice(int id, Voice voice)
     {
         IntroVoice[id] = voice;
     }
-
-
-    private Dictionary<int, Voice> QuestionResponceVoice = new Dictionary<int, Voice>();
-    public void StoreResponceVoice(int id, Voice voice)
+    public Voice GetIntroVoice(int id)
     {
-        QuestionResponceVoice[id] = voice;
-    }
-
-    public Voice GetResponceVoice(int index)
-    {
-        // 引数:INDEXに応じた、1セクションの発話が句読点ごとに区切られた音声を返す
-        if (QuestionResponceVoice[index]!=null)
+        // 引数:IDに応じた、返答文が句読点ごとに区切られた音声を返す
+        if (IntroVoice[id]!=null)
         {
-            Voice voice = QuestionResponceVoice[index];
+            Voice voice = IntroVoice[id];
             return voice;
         }
         else
         {
-            Debug.Log("nullやで笑");
+            Debug.Log("キーが辞書に存在しません: " + id);
+            return null;
+        }
+    }
+
+
+    private Dictionary<int, List<Voice>> QuestionResponceVoice = new Dictionary<int, List<Voice>>();
+    public void StoreResponceVoice(int id, List<Voice> voice)
+    {
+        QuestionResponceVoice[id] = voice;
+    }
+
+    public List<Voice> GetResponceVoice(int id)
+    {
+        // 引数:IDに応じた、返答文が句読点ごとに区切られた音声を返す
+        if (QuestionResponceVoice.TryGetValue(id, out List<Voice> voice))
+        {
+            return voice;
+        }
+        else
+        {
+            Debug.Log("キーが辞書に存在しません: " + id);
             return null;
         }
 
     }
 
-   public Voice GetVoice(int id)
-    {
-        if (QuestionResponceVoice.TryGetValue(id, out Voice voice))
-        {
-            return voice;
-        }
-        return null;
-    }
 }
 
 

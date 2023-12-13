@@ -10,6 +10,7 @@ using VoicevoxBridge;
 using System.Threading.Tasks;
 using System.Threading;
 using TMPro;
+using System.Linq;
 
 
 [System.Serializable]
@@ -38,9 +39,7 @@ public class Receiver : MonoBehaviour
     UdpClient client;
     int LOCAL_PORT = 50007;
 
-    public Voicemanager _Voice;
-    public ResponceMessageStorage RMStorage = new ResponceMessageStorage();
-    private QuestionSceneVoiceStorage _QVstorage = new QuestionSceneVoiceStorage();
+    public MainManager _main;
 
     private Queue<Action> mainThreadActions = new Queue<Action>();
 
@@ -56,7 +55,7 @@ public class Receiver : MonoBehaviour
         StartTrackingSection();
 
         // RMStorage の MessageAdded イベントにハンドラを登録
-        RMStorage.MessageAdded += OnMessageAdded;///イベント発生したらOnMessageAddedを呼ぶ
+        _main._RMStorage.MessageAdded += OnMessageAdded;///イベント発生したらOnMessageAddedを呼ぶ
 
     }
 
@@ -85,13 +84,13 @@ public class Receiver : MonoBehaviour
                 // JSONデータを解析
                 MessageData messageData = JsonUtility.FromJson<MessageData>(json);
 
-/*                Debug.Log("ID: " + messageData.id);
-                Debug.Log("Content: " + messageData.content);
-                Debug.Log("IsResponse: " + messageData.isResponse);*/
+                /*                Debug.Log("ID: " + messageData.id);
+                                Debug.Log("Content: " + messageData.content);
+                                Debug.Log("IsResponse: " + messageData.isResponse);*/
 
                 // ここで受信したデータをもとにインターフェースの操作などを行う
                 // メッセージをMessageStorageに保存
-                RMStorage.AddMessage(messageData);
+                _main._RMStorage.AddMessage(messageData);
 
                 // 受信したメッセージに基づいて実行したい処理をキューに追加
                 mainThreadActions.Enqueue(() => Create_QuestionNode(messageData.content, messageData.isResponse));
@@ -124,20 +123,29 @@ public class Receiver : MonoBehaviour
         }
     }
 
-    private async void OnMessageAdded(MessageData message)
+    public async void OnMessageAdded(MessageData message)
     {
         // メッセージが追加されたときに呼ばれる関数
-        Debug.Log("メッセージイベント発生！！！！！！！！！");
-        try
+        mainThreadActions.Enqueue(async () =>
         {
-            Voice voice = await _Voice.CreateOneVoice(message.content);
-            _QVstorage.StoreResponceVoice(message.id, voice);
-            Debug.Log("メッセージイベントから保存完了！！！！！！！！！");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError("音声生成中にエラーが発生しました: " + ex.Message);
-        }
+            //Debug.Log("メッセージイベント発生！！！！！！！！！");
+            try
+            {
+                string[] splittext = message.content.Split(char.Parse("。"));
+                List<string> splitList = splittext.ToList();
+
+                if (message.isResponse)
+                {
+                    List<Voice> voice = await _main._Voice.CreateVoiceDate(message.id, splitList);
+                    _main._RVStorage.StoreResponceVoice(message.id, voice);
+                    Debug.Log($"ID={message.id}の音声メッセージ保存完了！！！！！！！！！");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("音声生成中にエラーが発生しました: " + ex.Message);
+            }
+        });
     }
 
     public void StartTrackingSection()
@@ -148,16 +156,16 @@ public class Receiver : MonoBehaviour
     public int RandomID_ThisSection()
     {
         List<int> list = new List<int>(IDsInSection);
-        // ここで currentSectionMessages には、現在のセクション中に受け取ったメッセージが含まれています
-        Debug.Log(IDsInSection);
+        
         int randomIndex = IDsInSection[UnityEngine.Random.Range(0, list.Count)];
+        Debug.Log(randomIndex);
         return randomIndex;
     }
 
-    ///Udpから送られたテキストをIDから取得
+/*    ///Udpから送られたテキストをIDから取得
     public string GetMessage(int messageId, bool isResponse)
     {
-        List<MessageData> messages = RMStorage.GetMessagesById(messageId);
+        List<MessageData> messages = _main._RMStorage.GetMessagesById(messageId);
         foreach (var message in messages)
         {
             if (message.isResponse == isResponse)
@@ -169,7 +177,7 @@ public class Receiver : MonoBehaviour
         }
         // 条件に一致するメッセージがない場合は空の文字列またはデフォルト値を返す
         return "";
-    }
+    }*/
 
     private void Create_QuestionNode(string text,bool isResponse)
     {

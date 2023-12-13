@@ -5,25 +5,22 @@ using UnityEngine.UI;
 using TMPro;
 using VoicevoxBridge;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 public class Voicemanager : MonoBehaviour
 {
     private List<string> SplitText;
-    [SerializeField] GameObject bottun;
     [SerializeField] VOICEVOX voicevox;///VOICEVOXスクリプトアタッチしたオブジェクトを入れろ
     public int speaker = 20;　//もち子さん
 
-
-    
-    void Start()
-    {
-
-    }
+    ///同時呼び出しを制御
+    private SemaphoreSlim voiceSemaphore = new SemaphoreSlim(1, 1);
 
     public async Task<List<Voice>> CreateVoiceDate(int index,List<string> SplitText)
     {///voicevoxで音声合成をする(リストを返す)
 
+        // 音声生成のロジック
         List<Voice> voicelist = new List<Voice>();
         int i = 0;
         do
@@ -40,12 +37,8 @@ public class Voicemanager : MonoBehaviour
         }
         while (i < SplitText.Count);
 
-        if (index == 0)
-        {///最初の音声合成時にボタンをtrueにする
-            bottun.SetActive(true);
-        }
-
         return voicelist;
+
     }
 
     public async Task<Voice> CreateOneVoice(string Text)
@@ -58,7 +51,7 @@ public class Voicemanager : MonoBehaviour
         if (!string.IsNullOrEmpty(addtext))
         {
             voice = await voicevox.CreateVoice(speaker, addtext);
-            Debug.Log($"音声合成結果: {voice != null}");
+            //Debug.Log($"音声合成結果: {voice != null}");
         }
 
         else
