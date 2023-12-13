@@ -25,7 +25,7 @@ public class Voicemanager : MonoBehaviour
         int i = 0;
         do
         {
-            string addtext = SplitText[i].Replace("「", "").Replace("」", "").Replace("\\n", "");
+            string addtext = SplitText[i];
 
             // addtextが空でないかチェックしてから追加
             if (!string.IsNullOrEmpty(addtext))

@@ -34,6 +34,8 @@ public class MainManager : MonoBehaviour
     private int CurrentSectionIndex=0;///mainループを規定するインデックス
     //bool isPlayingSection = false;
 
+    private int AnswerTimes = 3;//１回のセクションで質問に答える回数
+
    
 
     void Start()
@@ -125,6 +127,7 @@ public class MainManager : MonoBehaviour
     private async Task QuestionScene()
     {
         _BB.UpdateBlackBoard(0, textureList);
+
         for (int i = 0; i < _RVStorage.IntroText.Count; i++)
         {
             Create_captions(_RVStorage.IntroText[i]);
@@ -132,51 +135,104 @@ public class MainManager : MonoBehaviour
             await voicevox.Play(v, autoReleaseVoice: false); // 音声再生
         }
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < AnswerTimes; i++)///三回質問に答える
         {
-            try
+            bool retry = false;
+            do
             {
-                Debug.Log($"i={i}のレスポンスを返します");
-                int n = _receiver.RandomID_ThisSection();
-                Debug.Log($"RandomID_ThisSectionから返されたID: {n}");
-                MessageData responceMessagedata = _RMStorage.GetMessageData(n, true);
-                if (responceMessagedata == null)
+                //Debug.Log("現在のi=" + i);
+                try
                 {
-                    Debug.Log($"ID {n} のMessageDataが見つかりませんでした。");
-                    continue;
+                    Debug.Log($"i={i}のレスポンスを返します");
+                    int n = _receiver.RandomID_ThisSection();
+                    Debug.Log($"RandomID_ThisSectionから返されたID: {n}");
+
+                    // RandomID_ThisSection が -1(答えられる質問が１つもない)を返した場合の処理
+                    if (n == -1)
+                    {
+                        _header.Create_TextNode("質問を受付中…");
+                        Debug.LogError("有効なIDが見つかりませんでした。");
+                        await Task.Delay(5000); // 3秒待機
+                        Voice vo;
+                        switch (i)
+                        {
+                            case 0:
+                                vo = await voicevox.CreateVoice(20, "質問受付中ですよ？質問がないなら先に進んじゃいますよ？");
+                                Create_captions("質問受付中ですよ？質問がないなら先に進んじゃいますよ？");
+                                await voicevox.Play(vo);
+                                break;
+                            case 1:
+                                vo = await voicevox.CreateVoice(20, "コメントはありませんか？もう少し待ちましょうか？");
+                                Create_captions("コメントはありませんか？もう少し待ちましょうか？");
+                                await voicevox.Play(vo);
+                                break;
+                            default:
+                                vo = await voicevox.CreateVoice(20, "寂しいですね。次進んじゃいますよ？");
+                                Create_captions("寂しいですね。次進んじゃいますよ？");
+                                await voicevox.Play(vo);
+                                break;
+                        }
+                        retry = false;
+                        break; // 処理をスキップして次の反復に進む
+                    }
+
+                    MessageData responceMessagedata = _RMStorage.GetMessageData(n, true);
+                    if (responceMessagedata == null)
+                    {
+                        Debug.Log($"ID {n} のMessageDataが見つかりませんでした。");
+                        retry = false; // ループを終了させる
+                        break; // このtryブロックの処理を終了し、forループの次の反復に進む
+                    }
+
+                    string[] splittext = responceMessagedata.content.Split(char.Parse("。"));
+                    List<string> txtlist = splittext.ToList();
+                    //Debug.Log($"分割されたテキストリストのサイズ: {txtlist.Count}");
+
+                    List<Voice> voicelist = _RVStorage.GetResponceVoice(n);
+                    if (voicelist == null)// || voicelist.Count == 0)
+                    {
+                        Debug.Log($"ID {n} のVoiceリストが不完全、または見つかりませんでした。");
+                        retry = false; // ループを終了させる
+                        break; // このtryブロックの処理を終了し、forループの次の反復に進む
+                    }
+                    //Debug.Log($"取得されたVoiceリストのサイズ: {voicelist.Count}");
+
+                    ///質問文を表示する
+                    MessageData Question = _RMStorage.GetMessageData(n, false);
+                    _header.Create_TextNode(Question.content);
+
+                    ///質問への解答を表示、再生する
+                    // テキストリストと音声リストの要素数が異なる場合は調整する
+                    int minCount = Math.Min(txtlist.Count, voicelist.Count);
+
+                    // jの値がリストのサイズ内に収まっていることを確認
+                    for (int j = 0; j < minCount; j++)
+                    {
+                        //Debug.Log($"テキスト: {txtlist[j]}, Voiceインデックス: {j}");
+                        Create_captions(txtlist[j]); // 字幕生成
+
+                        // jがvoicelistのサイズ内に収まっていることを確認
+                        if (j < voicelist.Count)
+                        {
+                            await voicevox.Play(voicelist[j]); // 音声再生
+                        }
+                        else
+                        {
+                            Debug.LogError($"Voiceリストのインデックス範囲外: インデックス {j}, Voiceリストのサイズ {voicelist.Count}");
+                            // 必要に応じてここでエラー処理やフォールバック処理を行う
+                        }
+                    }
+                    retry = false;
+                    await Task.Delay(3000);
                 }
-
-                string[] splittext = responceMessagedata.content.Split(char.Parse("。"));
-                List<string> txtlist = splittext.ToList();
-                Debug.Log($"分割されたテキストリストのサイズ: {txtlist.Count}");
-
-                List<Voice> voicelist = _RVStorage.GetResponceVoice(n);
-                if (voicelist == null || voicelist.Count == 0)
+                catch (Exception ex)
                 {
-                    Debug.Log($"ID {n} のVoiceリストが不完全、または見つかりませんでした。");
-                    continue;
+                    Debug.LogError($"エラーが発生しました: {ex.Message}");
+                    // 一定時間待機
+                    await Task.Delay(3000); // ここでは3秒待機しています
+                    retry = true; // 再試行フラグを立てる
                 }
-                Debug.Log($"取得されたVoiceリストのサイズ: {voicelist.Count}");
-                // テキストリストと音声リストの要素数が異なる場合は調整する
-                int minCount = Math.Min(txtlist.Count, voicelist.Count);
-
-                ///質問文を表示する
-                MessageData Question = _RMStorage.GetMessageData(n, false);
-                _header.Create_TextNode(Question.content);
-                ///質問への解答を表示、再生する
-                for (int j = 0; j < minCount; j++)
-                {
-                    Debug.Log($"テキスト: {txtlist[j]}, Voiceインデックス: {j}");
-                    Create_captions(txtlist[j]); // 字幕生成
-                    await voicevox.Play(voicelist[j], autoReleaseVoice: false); // 音声再生
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"QuestionSceneでエラーが発生したため強制移行します: {ex.Message}");
-                // ここで例外が発生した場合、ループを終了して次のセクションに移行
-                return;
-            }
+            } while (retry); // retryがtrueの場合、再試行する
         }
     }
 

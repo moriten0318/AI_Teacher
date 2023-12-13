@@ -98,21 +98,6 @@ public class Receiver : MonoBehaviour
                 if (messageData.isResponse)
                 {
                     IDsInSection.Add(messageData.id);
-
-/*                    Task.Run(async () =>
-                    {
-                        Debug.Log("音声合成を開始: " + messageData.content);
-                        try
-                        {
-                            var voice = await _Voice.CreateOneVoice(messageData.content);
-                            UDPVStorage.StoreVoice(messageData.id, voice);
-                            Debug.Log("受信した音声を合成しました: " + messageData.content);
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.LogError("音声合成エラー: " + ex.Message);
-                        }
-                    });*/
                 }
 
             }
@@ -155,29 +140,44 @@ public class Receiver : MonoBehaviour
 
     public int RandomID_ThisSection()
     {
-        List<int> list = new List<int>(IDsInSection);
-        
-        int randomIndex = IDsInSection[UnityEngine.Random.Range(0, list.Count)];
-        Debug.Log(randomIndex);
-        return randomIndex;
+        // IDsInSectionが空の場合は-1として無効な値を返す
+        if (IDsInSection.Count == 0)
+        {
+            Debug.LogError("IDsInSectionリストが空です。");
+            return -1;
+        }
+
+        // リストの全要素をコンマ区切りの文字列に結合
+        string idsJoined = String.Join(", ", IDsInSection);
+        Debug.Log("IDsInSectionの中身: " + idsJoined);
+
+        // ランダムにIDを選択
+        int randomIndex = UnityEngine.Random.Range(0, IDsInSection.Count);
+        int selectedID = IDsInSection[randomIndex];
+
+        // 選択されたIDをリストから削除
+        IDsInSection.RemoveAt(randomIndex);
+
+        //Debug.Log(selectedID);
+        return selectedID;
     }
 
-/*    ///Udpから送られたテキストをIDから取得
-    public string GetMessage(int messageId, bool isResponse)
-    {
-        List<MessageData> messages = _main._RMStorage.GetMessagesById(messageId);
-        foreach (var message in messages)
+    /*    ///Udpから送られたテキストをIDから取得(一応残しとく)
+        public string GetMessage(int messageId, bool isResponse)
         {
-            if (message.isResponse == isResponse)
+            List<MessageData> messages = _main._RMStorage.GetMessagesById(messageId);
+            foreach (var message in messages)
             {
-                // 指定されたタイプ（質問または回答）のメッセージのみを表示
-                //Debug.Log(message.content);
-                return message.content;
+                if (message.isResponse == isResponse)
+                {
+                    // 指定されたタイプ（質問または回答）のメッセージのみを表示
+                    //Debug.Log(message.content);
+                    return message.content;
+                }
             }
-        }
-        // 条件に一致するメッセージがない場合は空の文字列またはデフォルト値を返す
-        return "";
-    }*/
+            // 条件に一致するメッセージがない場合は空の文字列またはデフォルト値を返す
+            return "";
+        }*/
 
     private void Create_QuestionNode(string text,bool isResponse)
     {
