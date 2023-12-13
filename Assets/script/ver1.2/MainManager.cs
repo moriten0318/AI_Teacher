@@ -175,55 +175,59 @@ public class MainManager : MonoBehaviour
                         retry = false;
                         break; // 処理をスキップして次の反復に進む
                     }
-
-                    MessageData responceMessagedata = _RMStorage.GetMessageData(n, true);
-                    if (responceMessagedata == null)
+                    else 
                     {
-                        Debug.Log($"ID {n} のMessageDataが見つかりませんでした。");
-                        retry = false; // ループを終了させる
-                        break; // このtryブロックの処理を終了し、forループの次の反復に進む
-                    }
-
-                    string[] splittext = responceMessagedata.content.Split(char.Parse("。"));
-                    List<string> txtlist = splittext.ToList();
-                    //Debug.Log($"分割されたテキストリストのサイズ: {txtlist.Count}");
-
-                    List<Voice> voicelist = _RVStorage.GetResponceVoice(n);
-                    if (voicelist == null)// || voicelist.Count == 0)
-                    {
-                        Debug.Log($"ID {n} のVoiceリストが不完全、または見つかりませんでした。");
-                        retry = false; // ループを終了させる
-                        break; // このtryブロックの処理を終了し、forループの次の反復に進む
-                    }
-                    //Debug.Log($"取得されたVoiceリストのサイズ: {voicelist.Count}");
-
-                    ///質問文を表示する
-                    MessageData Question = _RMStorage.GetMessageData(n, false);
-                    _header.Create_TextNode(Question.content);
-
-                    ///質問への解答を表示、再生する
-                    // テキストリストと音声リストの要素数が異なる場合は調整する
-                    int minCount = Math.Min(txtlist.Count, voicelist.Count);
-
-                    // jの値がリストのサイズ内に収まっていることを確認
-                    for (int j = 0; j < minCount; j++)
-                    {
-                        //Debug.Log($"テキスト: {txtlist[j]}, Voiceインデックス: {j}");
-                        Create_captions(txtlist[j]); // 字幕生成
-
-                        // jがvoicelistのサイズ内に収まっていることを確認
-                        if (j < voicelist.Count)
+                        while (!_receiver.CheckComplete(n))
                         {
-                            await voicevox.Play(voicelist[j]); // 音声再生
+                            // 音声がまだ生成されていない場合
+                            Debug.Log($"ID {n} の音声はまだ生成されていません。少し待機します。");
+                            await Task.Delay(3000); // 3秒待機
                         }
-                        else
+
+                        //生成完了後
+                        MessageData responceMessagedata = _RMStorage.GetMessageData(n, true);
+                        if (responceMessagedata == null)
                         {
-                            Debug.LogError($"Voiceリストのインデックス範囲外: インデックス {j}, Voiceリストのサイズ {voicelist.Count}");
-                            // 必要に応じてここでエラー処理やフォールバック処理を行う
+                            Debug.Log($"ID {n} のMessageDataが見つかりませんでした。");
+                            retry = false; // ループを終了させる
+                            break; // このtryブロックの処理を終了し、forループの次の反復に進む
                         }
+
+                        string[] splittext = responceMessagedata.content.Split(char.Parse("。"));
+                        List<string> txtlist = splittext.ToList();
+                        //Debug.Log($"分割されたテキストリストのサイズ: {txtlist.Count}");
+
+                        List<Voice> voicelist = _RVStorage.GetResponceVoice(n);
+                        //Debug.Log($"取得されたVoiceリストのサイズ: {voicelist.Count}");
+
+                        ///質問文を表示する
+                        MessageData Question = _RMStorage.GetMessageData(n, false);
+                        _header.Create_TextNode(Question.content);
+
+                        ///質問への解答を表示、再生する
+                        // テキストリストと音声リストの要素数が異なる場合は調整する
+                        int minCount = Math.Min(txtlist.Count, voicelist.Count);
+
+                        // jの値がリストのサイズ内に収まっていることを確認
+                        for (int j = 0; j < minCount; j++)
+                        {
+                            //Debug.Log($"テキスト: {txtlist[j]}, Voiceインデックス: {j}");
+                            Create_captions(txtlist[j]); // 字幕生成
+
+                            // jがvoicelistのサイズ内に収まっていることを確認
+                            if (j < voicelist.Count)
+                            {
+                                await voicevox.Play(voicelist[j]); // 音声再生
+                            }
+                            else
+                            {
+                                Debug.LogError($"Voiceリストのインデックス範囲外: インデックス {j}, Voiceリストのサイズ {voicelist.Count}");
+                                // 必要に応じてここでエラー処理やフォールバック処理を行う
+                            }
+                        }
+                        retry = false;
+                        await Task.Delay(3000);
                     }
-                    retry = false;
-                    await Task.Delay(3000);
                 }
                 catch (Exception ex)
                 {

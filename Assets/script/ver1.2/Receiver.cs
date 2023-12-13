@@ -108,27 +108,42 @@ public class Receiver : MonoBehaviour
         }
     }
 
+    private Dictionary<int, bool> voiceCompleted = new Dictionary<int, bool>();
+
+    public bool CheckComplete(int id)
+    {
+        return voiceCompleted.ContainsKey(id) && voiceCompleted[id];
+    }
+
+    public void Reset(int id)
+    {
+        if (voiceCompleted.ContainsKey(id))
+        {
+            voiceCompleted[id] = false;
+        }
+    }
+
     public async void OnMessageAdded(MessageData message)
     {
-        // メッセージが追加されたときに呼ばれる関数
         mainThreadActions.Enqueue(async () =>
         {
-            //Debug.Log("メッセージイベント発生！！！！！！！！！");
             try
             {
-                string[] splittext = message.content.Split(char.Parse("。"));
-                List<string> splitList = splittext.ToList();
+                string[] splitText = message.content.Split(char.Parse("。"));
+                List<string> splitList = splitText.ToList();
 
                 if (message.isResponse)
                 {
-                    List<Voice> voice = await _main._Voice.CreateVoiceDate(message.id, splitList);
-                    _main._RVStorage.StoreResponceVoice(message.id, voice);
-                    Debug.Log($"ID={message.id}の音声メッセージ保存完了！！！！！！！！！");
+                    voiceCompleted[message.id] = false;
+                    List<Voice> voices = await _main._Voice.CreateVoiceDate(message.id, splitList);
+                    _main._RVStorage.StoreResponceVoice(message.id, voices);
+                    voiceCompleted[message.id] = true;
+                    Debug.Log($"ID={message.id}の音声メッセージ保存完了");
                 }
             }
             catch (Exception ex)
             {
-                Debug.LogError("音声生成中にエラーが発生しました: " + ex.Message);
+                Debug.LogError("音声生成中にエラー: " + ex.Message);
             }
         });
     }
