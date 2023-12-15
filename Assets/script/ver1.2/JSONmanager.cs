@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using VoicevoxBridge;
+using System;
 using System.Text.RegularExpressions;
 using System.IO;
 
@@ -54,19 +55,25 @@ public class JSONmanager : MonoBehaviour
         int i = 0;
         foreach (string lesson in lessons)
         {
-            string[] splittext=lessons[i].Split(char.Parse("。"));
-            List<string> splitList = splittext.ToList();
-            
-            returndic[i] = splitList;
+            // 「。」と「？」を区切り文字として使用
+            string[] splittext = lesson.Split(new char[] { '。', '？' }, StringSplitOptions.None);
 
-/*            foreach (string text in _storage.GetLessonData(i))
+            List<string> splitList = new List<string>();
+            foreach (var text in splittext)
             {
-                Debug.Log(text);
-                Debug.Log(i);
-            }*/
+                // 空ではない文字列に対してのみ処理を実行
+                if (!string.IsNullOrEmpty(text))
+                {
+                    // 元のテキストに「？」を追加してリストに格納
+                    string newText = text.Contains("？") ? text + "？" : text;
+                    splitList.Add(newText);
+                }
+            }
 
+            returndic[i] = splitList;
             i++;
         }
+
         Debug.Log("JSONのロード完了");
         return returndic;
     }

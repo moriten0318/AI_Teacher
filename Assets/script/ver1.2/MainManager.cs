@@ -167,7 +167,7 @@ public class MainManager : MonoBehaviour
                                 await voicevox.Play(vo);
                                 break;
                             default:
-                                vo = await voicevox.CreateVoice(20, "寂しいですね。次進んじゃいますよ？");
+                                vo = await voicevox.CreateVoice(20, "質問が無ければ次に進みますね。");
                                 Create_captions("質問が無ければ次に進みますね。");
                                 await voicevox.Play(vo);
                                 break;
