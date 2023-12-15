@@ -28,7 +28,7 @@ public class JSONmanager : MonoBehaviour
     private LessonDataStorage _storage = new LessonDataStorage();
 
     string LESSONDATA_PATH = "C://Users//moris//Desktop//Mypython//AITeacher_python//lessondata";
-    string JSON_PATH = "//honji_tenkai_1202.json";
+    //string JSON_PATH = "//honji_tenkai_1214.json";
 
     public Lesson[] jsondata { get; private set; }    /// 読み取り専用の配列としてlessonsを定義
     public string[] lessons { get; private set; }    /// 読み取り専用の配列としてlessonsを定義
@@ -36,7 +36,16 @@ public class JSONmanager : MonoBehaviour
 
     public Dictionary<int, List<string>> LoadSpeech()
     {
-        string json = File.ReadAllText(LESSONDATA_PATH+JSON_PATH);
+        string[] jsonFiles = Directory.GetFiles(LESSONDATA_PATH, "*.json");
+
+        if (jsonFiles.Length == 0)
+        {
+            Debug.LogError("No JSON files found in the specified directory.");
+            return null;
+        }
+
+        // Assuming you want to load the first JSON file found in the directory.
+        string json = File.ReadAllText(jsonFiles[0]);
         jsondata = JsonHelper.FromJson<Lesson>(json);
 
         lessons = jsondata.Select(data => data.教師の発話).ToArray();///1要素に1セクションがある配列
